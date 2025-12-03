@@ -159,12 +159,12 @@ export default function PersonWishlistScreen() {
             </>
           )}
 
-          <View className="mb-4 rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
+          <View className="mb-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
             <View className="flex-row items-start">
-              <Text className="mr-3 text-2xl">🤫</Text>
-              <Text className="flex-1 text-sm text-amber-900">
-                Remember to keep your gift a secret! The magic of Secret Santa is in the surprise.
-                🎅
+              <Text className="mr-3 text-2xl">💡</Text>
+              <Text className="flex-1 text-sm text-emerald-900">
+                {personName} shared this wishlist with you! When you purchase through Amazon, you
+                support our app. 🎁
               </Text>
             </View>
           </View>

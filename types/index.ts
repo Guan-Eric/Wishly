@@ -9,23 +9,19 @@ export interface User {
   createdAt: Timestamp | Date;
 }
 
-export interface Group {
+export interface Occasion {
+  // was Group
   id: string;
   name: string;
   budget?: number | null;
-  exchangeDate?: string | null;
+  date?: string | null; // was exchangeDate
   createdBy: string;
-  memberEmails: string[];
-  memberIds: string[];
-  members: GroupMember[];
-  pendingMemberIds: string[];
-  matched: boolean;
-  assignments?: Assignment[];
+  type: 'birthday' | 'valentine' | 'anniversary' | 'christmas' | 'other';
+  sharedWith: string[]; // was memberIds
+  members: OccasionMember[]; // people who can see this list
   createdAt: Timestamp | Date;
   emoji: string;
-  colors?: string[];
   accent?: string;
-  creatorName: string;
 }
 
 export interface GroupInvite {
@@ -40,17 +36,10 @@ export interface GroupInvite {
   createdAt: Timestamp | Date;
 }
 
-export interface GroupMember {
+export interface OccasionMember {
   userId: string;
   name: string;
   email?: string;
-}
-
-export interface Assignment {
-  giverId: string;
-  giverName: string;
-  receiverId: string;
-  receiverName: string;
 }
 
 export interface WishlistItem {

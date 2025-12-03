@@ -2,11 +2,25 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Modal, ScrollView, Share, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView,
+  Share,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../../../firebase';
-import { getGroupById, sendGroupInvite, updateGroup, updateGroupMatching } from '../../../services/groupService';
-import { matchSecretSantas } from '../../../services/secretSantaMatcher';
+import {
+  getGroupById,
+  sendGroupInvite,
+  updateGroup,
+  updateGroupMatching,
+} from '../../../services/groupService';
 import { searchUsersByEmail } from '../../../services/userService';
 import { Group } from '../../../types/index';
 
@@ -17,19 +31,19 @@ export default function GroupDetailScreen() {
   const [matching, setMatching] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
-  
+
   // Edit fields
   const [editName, setEditName] = useState('');
   const [editBudget, setEditBudget] = useState('');
   const [editExchangeDate, setEditExchangeDate] = useState('');
   const [saving, setSaving] = useState(false);
-  
+
   // Add member fields
   const [memberEmail, setMemberEmail] = useState('');
   const [memberName, setMemberName] = useState('');
   const [addingMember, setAddingMember] = useState(false);
   const [searchingUser, setSearchingUser] = useState(false);
-  
+
   const router = useRouter();
   const userId = auth.currentUser?.uid;
 
@@ -39,7 +53,7 @@ export default function GroupDetailScreen() {
 
   const loadGroup = async () => {
     if (!groupId) return;
-    
+
     try {
       const groupData = await getGroupById(groupId as string);
       setGroup(groupData);
@@ -92,7 +106,7 @@ export default function GroupDetailScreen() {
     setSearchingUser(true);
     try {
       const users = await searchUsersByEmail(memberEmail.trim().toLowerCase());
-      
+
       if (users.length === 0) {
         Alert.alert(
           'User Not Found',
@@ -103,7 +117,7 @@ export default function GroupDetailScreen() {
       }
 
       const user = users[0];
-      
+
       // Check if already a member
       if (group?.memberIds.includes(user.id)) {
         Alert.alert('Already a Member', 'This user is already in the group');
@@ -129,9 +143,9 @@ export default function GroupDetailScreen() {
       Alert.alert('Missing Information', 'Please search for a user first');
       return;
     }
-  
+
     if (!group) return;
-  
+
     if (group.matched) {
       Alert.alert(
         'Cannot Add Members',
@@ -140,18 +154,18 @@ export default function GroupDetailScreen() {
       );
       return;
     }
-  
+
     setAddingMember(true);
     try {
       const users = await searchUsersByEmail(memberEmail.trim().toLowerCase());
-      
+
       if (users.length === 0) {
         Alert.alert('Error', 'User not found');
         return;
       }
-  
+
       const user = users[0];
-  
+
       // Send invite with user ID
       await sendGroupInvite(
         group.id,
@@ -162,8 +176,11 @@ export default function GroupDetailScreen() {
         auth.currentUser?.displayName || 'Someone',
         userId!
       );
-  
-      Alert.alert('Invite Sent!', `An invitation has been sent to ${user.displayName}. They will need to accept it to join the group.`);
+
+      Alert.alert(
+        'Invite Sent!',
+        `An invitation has been sent to ${user.displayName}. They will need to accept it to join the group.`
+      );
       setAddMemberModalVisible(false);
       setMemberEmail('');
       setMemberName('');
@@ -194,7 +211,10 @@ export default function GroupDetailScreen() {
             try {
               const assignments = matchSecretSantas(group.members);
               await updateGroupMatching(group.id, assignments);
-              Alert.alert('🎅 Success!', 'Secret Santas have been matched! Everyone can now see their assignments.');
+              Alert.alert(
+                '🎅 Success!',
+                'Secret Santas have been matched! Everyone can now see their assignments.'
+              );
               loadGroup();
             } catch (error: any) {
               console.error('Error matching:', error);
@@ -202,8 +222,8 @@ export default function GroupDetailScreen() {
             } finally {
               setMatching(false);
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -213,10 +233,11 @@ export default function GroupDetailScreen() {
 
     try {
       await Share.share({
-        message: `🎄 You're invited to join "${group.name}" Secret Santa exchange!\n\n` +
-                 `Join the festive fun and surprise your friends with the perfect gift! 🎁\n\n` +
-                 `Created by: ${group.creatorName}\n\n` +
-                 `Download the Secret Santa app and search for this group to join!`,
+        message:
+          `🎄 You're invited to join "${group.name}" Secret Santa exchange!\n\n` +
+          `Join the festive fun and surprise your friends with the perfect gift! 🎁\n\n` +
+          `Created by: ${group.creatorName}\n\n` +
+          `Download the Secret Santa app and search for this group to join!`,
         title: `Join ${group.name}`,
       });
     } catch (error) {
@@ -226,7 +247,7 @@ export default function GroupDetailScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-stone-50 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-stone-50">
         <ActivityIndicator size="large" color="#059669" />
       </View>
     );
@@ -234,7 +255,7 @@ export default function GroupDetailScreen() {
 
   if (!group) {
     return (
-      <View className="flex-1 bg-stone-50 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-stone-50">
         <Text className="text-stone-600">Group not found</Text>
       </View>
     );
@@ -247,24 +268,20 @@ export default function GroupDetailScreen() {
       <SafeAreaView edges={['top']} className="bg-emerald-600">
         <View className="px-4 pb-4">
           <View className="flex-row items-center">
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
-              className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4"
-            >
+              className="mr-4 h-12 w-12 items-center justify-center rounded-2xl bg-white/20">
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-2xl font-bold text-white">
                 {group.emoji} {group.name}
               </Text>
-              <Text className="text-white/80 text-sm">
-                Group Details
-              </Text>
+              <Text className="text-sm text-white/80">Group Details</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleShareGroup}
-              className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center"
-            >
+              className="h-12 w-12 items-center justify-center rounded-2xl bg-white/20">
               <Ionicons name="share-outline" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -273,60 +290,56 @@ export default function GroupDetailScreen() {
 
       <ScrollView className="flex-1 px-4 pt-6">
         {/* Group Info */}
-        <View className="bg-white rounded-2xl p-6 mb-4 border-2 border-stone-200">
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-sm text-stone-500 uppercase tracking-wider">
+        <View className="mb-4 rounded-2xl border-2 border-stone-200 bg-white p-6">
+          <View className="mb-4 flex-row items-center justify-between">
+            <Text className="text-sm uppercase tracking-wider text-stone-500">
               Group Information
             </Text>
             {isCreator && (
               <TouchableOpacity
                 onPress={() => setEditModalVisible(true)}
-                className="flex-row items-center bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200"
-              >
+                className="flex-row items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
                 <Ionicons name="pencil" size={16} color="#059669" />
-                <Text className="text-emerald-700 font-semibold ml-1 text-xs">Edit</Text>
+                <Text className="ml-1 text-xs font-semibold text-emerald-700">Edit</Text>
               </TouchableOpacity>
             )}
           </View>
-          
+
           <View className="mb-4">
-            <View className="flex-row items-center justify-between mb-2">
-              <View className="flex-row items-center flex-1">
+            <View className="mb-2 flex-row items-center justify-between">
+              <View className="flex-1 flex-row items-center">
                 <Ionicons name="people" size={20} color="#78716C" />
-                <Text className="text-stone-900 font-semibold ml-2">
+                <Text className="ml-2 font-semibold text-stone-900">
                   {group.members.length} Participants
                 </Text>
               </View>
               {isCreator && !group.matched && (
                 <TouchableOpacity
                   onPress={() => setAddMemberModalVisible(true)}
-                  className="flex-row items-center bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200"
-                >
+                  className="flex-row items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
                   <Ionicons name="person-add" size={16} color="#059669" />
-                  <Text className="text-emerald-700 font-semibold ml-1 text-xs">Add</Text>
+                  <Text className="ml-1 text-xs font-semibold text-emerald-700">Add</Text>
                 </TouchableOpacity>
               )}
             </View>
             {group.members.map((member, index) => (
-              <Text key={index} className="text-stone-600 ml-7">
+              <Text key={index} className="ml-7 text-stone-600">
                 • {member.name} {member.userId === group.createdBy && '(Creator)'}
               </Text>
             ))}
           </View>
 
           {group.budget && (
-            <View className="flex-row items-center mb-2">
+            <View className="mb-2 flex-row items-center">
               <Ionicons name="cash-outline" size={20} color="#78716C" />
-              <Text className="text-stone-900 font-semibold ml-2">
-                Budget: ${group.budget}
-              </Text>
+              <Text className="ml-2 font-semibold text-stone-900">Budget: ${group.budget}</Text>
             </View>
           )}
 
           {group.exchangeDate && (
             <View className="flex-row items-center">
               <Ionicons name="calendar-outline" size={20} color="#78716C" />
-              <Text className="text-stone-900 font-semibold ml-2">
+              <Text className="ml-2 font-semibold text-stone-900">
                 Exchange: {group.exchangeDate}
               </Text>
             </View>
@@ -335,27 +348,26 @@ export default function GroupDetailScreen() {
 
         {/* Matching Status */}
         {group.matched ? (
-          <View className="bg-emerald-50 rounded-2xl p-6 mb-4 border-2 border-emerald-200">
-            <View className="flex-row items-center mb-2">
+          <View className="mb-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
+            <View className="mb-2 flex-row items-center">
               <Ionicons name="checkmark-circle" size={24} color="#059669" />
-              <Text className="text-emerald-900 font-bold text-lg ml-2">
+              <Text className="ml-2 text-lg font-bold text-emerald-900">
                 Secret Santas Matched!
               </Text>
             </View>
             <Text className="text-emerald-700">
-              Everyone has been assigned their Secret Santa. Check the main screen to see who you got! 🎅
+              Everyone has been assigned their Secret Santa. Check the main screen to see who you
+              got! 🎅
             </Text>
           </View>
         ) : (
-          <View className="bg-amber-50 rounded-2xl p-6 mb-4 border-2 border-amber-200">
-            <View className="flex-row items-center mb-3">
+          <View className="mb-4 rounded-2xl border-2 border-amber-200 bg-amber-50 p-6">
+            <View className="mb-3 flex-row items-center">
               <Ionicons name="time-outline" size={24} color="#F59E0B" />
-              <Text className="text-amber-900 font-bold text-lg ml-2">
-                Not Matched Yet
-              </Text>
+              <Text className="ml-2 text-lg font-bold text-amber-900">Not Matched Yet</Text>
             </View>
-            <Text className="text-amber-700 mb-4">
-              {isCreator 
+            <Text className="mb-4 text-amber-700">
+              {isCreator
                 ? `You can match Secret Santas once you have at least 2 members. Currently: ${group.members.length} members.`
                 : 'Waiting for the group creator to match Secret Santas.'}
             </Text>
@@ -363,15 +375,14 @@ export default function GroupDetailScreen() {
               <TouchableOpacity
                 onPress={handleMatchSecretSantas}
                 disabled={matching}
-                className="bg-amber-600 py-4 rounded-xl items-center active:scale-95"
-                activeOpacity={0.8}
-              >
+                className="items-center rounded-xl bg-amber-600 py-4 active:scale-95"
+                activeOpacity={0.8}>
                 {matching ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <View className="flex-row items-center">
                     <Ionicons name="shuffle" size={20} color="#fff" />
-                    <Text className="text-white font-bold text-lg ml-2">
+                    <Text className="ml-2 text-lg font-bold text-white">
                       Match Secret Santas Now!
                     </Text>
                   </View>
@@ -382,24 +393,26 @@ export default function GroupDetailScreen() {
         )}
 
         {/* Instructions */}
-        <View className="bg-stone-100 rounded-2xl p-5 mb-4 border-2 border-stone-200">
+        <View className="mb-4 rounded-2xl border-2 border-stone-200 bg-stone-100 p-5">
           <View className="flex-row items-start">
-            <Text className="text-2xl mr-3">💡</Text>
+            <Text className="mr-3 text-2xl">💡</Text>
             <View className="flex-1">
-              <Text className="text-stone-900 font-bold mb-2">
-                How to invite members:
-              </Text>
-              <Text className="text-stone-700 text-sm">
+              <Text className="mb-2 font-bold text-stone-900">How to invite members:</Text>
+              <Text className="text-sm text-stone-700">
                 {isCreator ? (
-                  <>1. Click "Add" button above to add members by email{'\n'}
-                  2. Or share this group using the share button{'\n'}
-                  3. Members need to sign up with the app first{'\n'}
-                  4. Once everyone joins, match Secret Santas!</>
+                  <>
+                    1. Click "Add" button above to add members by email{'\n'}
+                    2. Or share this group using the share button{'\n'}
+                    3. Members need to sign up with the app first{'\n'}
+                    4. Once everyone joins, match Secret Santas!
+                  </>
                 ) : (
-                  <>1. Only the creator can add members{'\n'}
-                  2. Share the group link with the creator{'\n'}
-                  3. They can add you using your email{'\n'}
-                  4. Wait for Secret Santa matching!</>
+                  <>
+                    1. Only the creator can add members{'\n'}
+                    2. Share the group link with the creator{'\n'}
+                    3. They can add you using your email{'\n'}
+                    4. Wait for Secret Santa matching!
+                  </>
                 )}
               </Text>
             </View>
@@ -414,10 +427,9 @@ export default function GroupDetailScreen() {
         visible={editModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setEditModalVisible(false)}
-      >
+        onRequestClose={() => setEditModalVisible(false)}>
         <SafeAreaView edges={['top']} className="flex-1 bg-stone-50">
-          <View className="px-4 py-4 border-b-2 border-stone-200 bg-white">
+          <View className="border-b-2 border-stone-200 bg-white px-4 py-4">
             <View className="flex-row items-center justify-between">
               <Text className="text-2xl font-bold text-stone-900">Edit Group</Text>
               <TouchableOpacity onPress={() => setEditModalVisible(false)}>
@@ -428,48 +440,48 @@ export default function GroupDetailScreen() {
 
           <ScrollView className="flex-1 px-4 pt-6">
             <View className="mb-6">
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Group Name *
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-2xl px-5 py-4">
+              <View className="rounded-2xl border-2 border-stone-200 bg-white px-5 py-4">
                 <TextInput
                   placeholder="Group name"
                   placeholderTextColor="#A8A29E"
                   value={editName}
                   onChangeText={setEditName}
-                  className="text-stone-900 text-lg"
+                  className="text-lg text-stone-900"
                 />
               </View>
             </View>
 
             <View className="mb-6">
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Budget (Optional)
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-2xl px-5 py-4 flex-row items-center">
-                <Text className="text-stone-900 text-xl font-bold mr-2">$</Text>
+              <View className="flex-row items-center rounded-2xl border-2 border-stone-200 bg-white px-5 py-4">
+                <Text className="mr-2 text-xl font-bold text-stone-900">$</Text>
                 <TextInput
                   placeholder="e.g., 50"
                   placeholderTextColor="#A8A29E"
                   value={editBudget}
                   onChangeText={setEditBudget}
                   keyboardType="numeric"
-                  className="flex-1 text-stone-900 text-lg"
+                  className="flex-1 text-lg text-stone-900"
                 />
               </View>
             </View>
 
             <View className="mb-6">
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Exchange Date (Optional)
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-2xl px-5 py-4">
+              <View className="rounded-2xl border-2 border-stone-200 bg-white px-5 py-4">
                 <TextInput
                   placeholder="e.g., December 25, 2025"
                   placeholderTextColor="#A8A29E"
                   value={editExchangeDate}
                   onChangeText={setEditExchangeDate}
-                  className="text-stone-900 text-lg"
+                  className="text-lg text-stone-900"
                 />
               </View>
             </View>
@@ -477,13 +489,12 @@ export default function GroupDetailScreen() {
             <TouchableOpacity
               onPress={handleSaveEdit}
               disabled={saving}
-              className="bg-emerald-600 py-5 rounded-2xl items-center mb-8 active:scale-95"
-              activeOpacity={0.8}
-            >
+              className="mb-8 items-center rounded-2xl bg-emerald-600 py-5 active:scale-95"
+              activeOpacity={0.8}>
               {saving ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-white font-bold text-xl">Save Changes</Text>
+                <Text className="text-xl font-bold text-white">Save Changes</Text>
               )}
             </TouchableOpacity>
           </ScrollView>
@@ -495,10 +506,9 @@ export default function GroupDetailScreen() {
         visible={addMemberModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setAddMemberModalVisible(false)}
-      >
+        onRequestClose={() => setAddMemberModalVisible(false)}>
         <SafeAreaView edges={['top']} className="flex-1 bg-stone-50">
-          <View className="px-4 py-4 border-b-2 border-stone-200 bg-white">
+          <View className="border-b-2 border-stone-200 bg-white px-4 py-4">
             <View className="flex-row items-center justify-between">
               <Text className="text-2xl font-bold text-stone-900">Add Member</Text>
               <TouchableOpacity onPress={() => setAddMemberModalVisible(false)}>
@@ -508,20 +518,21 @@ export default function GroupDetailScreen() {
           </View>
 
           <ScrollView className="flex-1 px-4 pt-6">
-            <View className="bg-amber-50 rounded-2xl p-5 mb-6 border-2 border-amber-200">
+            <View className="mb-6 rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
               <View className="flex-row items-start">
-                <Text className="text-2xl mr-3">💡</Text>
-                <Text className="flex-1 text-amber-900 text-sm">
-                  The person must have signed up for the app first. Enter their email to search for them.
+                <Text className="mr-3 text-2xl">💡</Text>
+                <Text className="flex-1 text-sm text-amber-900">
+                  The person must have signed up for the app first. Enter their email to search for
+                  them.
                 </Text>
               </View>
             </View>
 
             <View className="mb-4">
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Member Email *
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-2xl px-5 py-4">
+              <View className="rounded-2xl border-2 border-stone-200 bg-white px-5 py-4">
                 <TextInput
                   placeholder="email@example.com"
                   placeholderTextColor="#A8A29E"
@@ -529,7 +540,7 @@ export default function GroupDetailScreen() {
                   onChangeText={setMemberEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  className="text-stone-900 text-lg"
+                  className="text-lg text-stone-900"
                 />
               </View>
             </View>
@@ -537,22 +548,21 @@ export default function GroupDetailScreen() {
             <TouchableOpacity
               onPress={handleSearchUser}
               disabled={searchingUser}
-              className="bg-emerald-600 py-4 rounded-xl items-center mb-4 active:scale-95"
-              activeOpacity={0.8}
-            >
+              className="mb-4 items-center rounded-xl bg-emerald-600 py-4 active:scale-95"
+              activeOpacity={0.8}>
               {searchingUser ? (
                 <ActivityIndicator color="#fff" />
               ) : (
                 <View className="flex-row items-center">
                   <Ionicons name="search" size={20} color="#fff" />
-                  <Text className="text-white font-bold text-lg ml-2">Search User</Text>
+                  <Text className="ml-2 text-lg font-bold text-white">Search User</Text>
                 </View>
               )}
             </TouchableOpacity>
 
             {memberName && (
-              <View className="bg-emerald-50 rounded-2xl p-5 mb-4 border-2 border-emerald-200">
-                <Text className="text-emerald-900 font-bold mb-1">User Found:</Text>
+              <View className="mb-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+                <Text className="mb-1 font-bold text-emerald-900">User Found:</Text>
                 <Text className="text-emerald-800">{memberName}</Text>
               </View>
             )}
@@ -561,15 +571,14 @@ export default function GroupDetailScreen() {
               <TouchableOpacity
                 onPress={handleAddMember}
                 disabled={addingMember}
-                className="bg-emerald-600 py-5 rounded-2xl items-center mb-8 active:scale-95"
-                activeOpacity={0.8}
-              >
+                className="mb-8 items-center rounded-2xl bg-emerald-600 py-5 active:scale-95"
+                activeOpacity={0.8}>
                 {addingMember ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <View className="flex-row items-center">
                     <Ionicons name="person-add" size={20} color="#fff" />
-                    <Text className="text-white font-bold text-xl ml-2">Add Member</Text>
+                    <Text className="ml-2 text-xl font-bold text-white">Add Member</Text>
                   </View>
                 )}
               </TouchableOpacity>

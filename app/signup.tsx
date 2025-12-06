@@ -2,7 +2,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebase';
 import { createUserProfile } from '../services/userService';
@@ -27,26 +37,16 @@ export default function SignupScreen() {
 
     try {
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        email.trim(), 
-        password
-      );
-      
-      await updateProfile(userCredential.user, { displayName: name.trim() });
-      
-      // Create user profile in Firestore
-      await createUserProfile(
-        userCredential.user.uid,
-        email.trim(),
-        name.trim()
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
 
-      Alert.alert(
-        '🎉 Welcome!', 
-        'Your account has been created successfully!',
-        [{ text: 'OK', onPress: () => router.replace('/(tabs)/(group)/group') }]
-      );
+      await updateProfile(userCredential.user, { displayName: name.trim() });
+
+      // Create user profile in Firestore
+      await createUserProfile(userCredential.user.uid, email.trim(), name.trim());
+
+      Alert.alert('🎉 Welcome!', 'Your account has been created successfully!', [
+        { text: 'OK', onPress: () => router.replace('/(tabs)/(occasion)/occasion') },
+      ]);
     } catch (error: any) {
       console.error('Signup error:', error);
       if (error.code === 'auth/email-already-in-use') {
@@ -64,48 +64,42 @@ export default function SignupScreen() {
   return (
     <View className="flex-1 bg-stone-50">
       <SafeAreaView edges={['top']} className="flex-1">
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          className="flex-1"
-        >
-          <ScrollView 
+          className="flex-1">
+          <ScrollView
             className="flex-1 px-6"
             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-            keyboardShouldPersistTaps="handled"
-          >
+            keyboardShouldPersistTaps="handled">
             {/* Header */}
-            <View className="items-center mb-12">
-              <View className="w-24 h-24 bg-emerald-100 rounded-full items-center justify-center mb-6">
+            <View className="mb-12 items-center">
+              <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-emerald-100">
                 <Text className="text-6xl">🎄</Text>
               </View>
-              <Text className="text-4xl font-bold text-stone-900 mb-2">
-                Create Account
-              </Text>
-              <Text className="text-base text-stone-600">
-                Join the festive gift exchange
-              </Text>
+              <Text className="mb-2 text-4xl font-bold text-stone-900">Create Account</Text>
+              <Text className="text-base text-stone-600">Join the festive gift exchange</Text>
             </View>
 
             {/* Input Fields */}
             <View className="mb-6">
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Full Name
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-xl px-5 py-4 flex-row items-center mb-5">
+              <View className="mb-5 flex-row items-center rounded-xl border-2 border-stone-200 bg-white px-5 py-4">
                 <Ionicons name="person-outline" size={22} color="#78716C" />
                 <TextInput
                   placeholder="Your name"
                   placeholderTextColor="#A8A29E"
                   value={name}
                   onChangeText={setName}
-                  className="flex-1 text-stone-900 text-base ml-3"
+                  className="ml-3 flex-1 text-base text-stone-900"
                 />
               </View>
 
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Email
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-xl px-5 py-4 flex-row items-center mb-5">
+              <View className="mb-5 flex-row items-center rounded-xl border-2 border-stone-200 bg-white px-5 py-4">
                 <Ionicons name="mail-outline" size={22} color="#78716C" />
                 <TextInput
                   placeholder="email@example.com"
@@ -115,14 +109,14 @@ export default function SignupScreen() {
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
-                  className="flex-1 text-stone-900 text-base ml-3"
+                  className="ml-3 flex-1 text-base text-stone-900"
                 />
               </View>
 
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Password
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-xl px-5 py-4 flex-row items-center">
+              <View className="flex-row items-center rounded-xl border-2 border-stone-200 bg-white px-5 py-4">
                 <Ionicons name="lock-closed-outline" size={22} color="#78716C" />
                 <TextInput
                   placeholder="At least 6 characters"
@@ -130,10 +124,10 @@ export default function SignupScreen() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
-                  className="flex-1 text-stone-900 text-base ml-3"
+                  className="ml-3 flex-1 text-base text-stone-900"
                 />
               </View>
-              <Text className="text-stone-500 text-xs mt-2 ml-1">
+              <Text className="ml-1 mt-2 text-xs text-stone-500">
                 Password must be at least 6 characters long
               </Text>
             </View>
@@ -142,45 +136,36 @@ export default function SignupScreen() {
             <TouchableOpacity
               onPress={handleSignup}
               disabled={loading}
-              className="py-5 rounded-xl items-center mb-4 active:scale-95"
+              className="mb-4 items-center rounded-xl py-5 active:scale-95"
               style={{ backgroundColor: '#059669' }}
-              activeOpacity={0.8}
-            >
+              activeOpacity={0.8}>
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
                 <View className="flex-row items-center">
                   <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
-                  <Text className="text-white font-bold text-lg ml-2">
-                    Create Account
-                  </Text>
+                  <Text className="ml-2 text-lg font-bold text-white">Create Account</Text>
                 </View>
               )}
             </TouchableOpacity>
 
             {/* Terms Notice */}
-            <View className="bg-stone-100 rounded-xl p-4 mb-4">
-              <Text className="text-stone-600 text-xs text-center">
+            <View className="mb-4 rounded-xl bg-stone-100 p-4">
+              <Text className="text-center text-xs text-stone-600">
                 By creating an account, you agree to our Terms of Service and Privacy Policy
               </Text>
             </View>
 
             {/* Login Link */}
-            <TouchableOpacity 
-              onPress={() => router.push("/login")}
-              className="py-4"
-            >
-              <Text className="text-stone-700 text-center text-base">
-                Already have an account?{' '}
-                <Text className="font-bold text-emerald-700">
-                  Sign in
-                </Text>
+            <TouchableOpacity onPress={() => router.push('/login')} className="py-4">
+              <Text className="text-center text-base text-stone-700">
+                Already have an account? <Text className="text-primary-700 font-bold">Sign in</Text>
               </Text>
             </TouchableOpacity>
 
             {/* Festive Footer */}
-            <View className="items-center mt-8">
-              <Text className="text-stone-400 text-sm">🎁 ⭐ 🎅 ❄️ 🔔 🎁</Text>
+            <View className="mt-8 items-center">
+              <Text className="text-sm text-stone-400">🎁 ⭐ 🎅 ❄️ 🔔 🎁</Text>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

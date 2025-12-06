@@ -1,4 +1,3 @@
-// app/onboarding/step2.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -8,77 +7,58 @@ export default function OnboardingStep2() {
   const router = useRouter();
 
   return (
-    <View className="flex-1" style={{ backgroundColor: '#FEF2F2' }}>
+    <View className="flex-1" style={{ backgroundColor: '#FCE7F3' }}>
       <SafeAreaView className="flex-1">
-        {/* Skip Button */}
-        <View className="absolute top-16 right-6 z-10">
-          <TouchableOpacity 
+        <View className="absolute right-6 top-16 z-10">
+          <TouchableOpacity
             onPress={() => router.replace('/login')}
-            className="bg-white/80 px-5 py-2 rounded-full"
-          >
-            <Text className="text-stone-600 font-semibold">Skip</Text>
+            className="rounded-full bg-white/80 px-5 py-2">
+            <Text className="font-semibold text-stone-600">Skip</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Back Button */}
-        <View className="absolute top-14 left-6 z-10">
-          <TouchableOpacity 
+        <View className="absolute left-6 top-14 z-10">
+          <TouchableOpacity
             onPress={() => router.back()}
-            className="w-12 h-12 bg-white/80 rounded-full items-center justify-center"
-          >
+            className="h-12 w-12 items-center justify-center rounded-full bg-white/80">
             <Ionicons name="arrow-back" size={24} color="#57534E" />
           </TouchableOpacity>
         </View>
 
-        {/* Content */}
-        <View className="flex-1 justify-center items-center px-8">
-          {/* Icon Badge */}
-          <View 
-            className="rounded-2xl p-4 mb-8"
-            style={{ backgroundColor: '#EF4444' }}
-          >
+        <View className="flex-1 items-center justify-center px-8">
+          <View className="mb-8 rounded-2xl p-4" style={{ backgroundColor: '#EC4899' }}>
             <Ionicons name="heart" size={40} color="#fff" />
           </View>
 
-          {/* Text Content */}
           <View className="items-center">
-            <Text className="text-4xl font-bold text-stone-900 text-center mb-3">
-              Build Your Wishlist
+            <Text className="mb-3 text-center text-4xl font-bold text-stone-900">
+              Share with Friends & Family
             </Text>
-            
-            <Text 
-              className="text-xl font-semibold text-center mb-6"
-              style={{ color: '#EF4444' }}
-            >
-              Find the Perfect Gifts
+
+            <Text className="mb-6 text-center text-xl font-semibold" style={{ color: '#EC4899' }}>
+              Never Get Unwanted Gifts
             </Text>
-            
-            <Text className="text-lg text-stone-700 text-center leading-relaxed px-4">
-              Add items from Amazon to your wishlist so your Secret Santa knows exactly what you want
+
+            <Text className="px-4 text-center text-lg leading-relaxed text-stone-700">
+              Share your wishlists so loved ones know exactly what you want for any occasion
             </Text>
           </View>
         </View>
 
-        {/* Bottom Controls */}
         <View className="px-6 pb-8">
-          {/* Dots Indicator */}
-          <View className="flex-row justify-center gap-2 mb-8">
+          <View className="mb-8 flex-row justify-center gap-2">
             <View className="h-2 w-2 rounded-full bg-stone-300" />
-            <View className="h-2 w-8 rounded-full" style={{ backgroundColor: '#EF4444' }} />
+            <View className="h-2 w-8 rounded-full" style={{ backgroundColor: '#EC4899' }} />
             <View className="h-2 w-2 rounded-full bg-stone-300" />
           </View>
 
-          {/* Next Button */}
           <TouchableOpacity
             onPress={() => router.push('/step3')}
-            className="py-5 rounded-xl items-center active:scale-95"
+            className="items-center rounded-xl py-5 active:scale-95"
             activeOpacity={0.8}
-            style={{ backgroundColor: '#EF4444' }}
-          >
+            style={{ backgroundColor: '#EC4899' }}>
             <View className="flex-row items-center">
-              <Text className="text-white font-bold text-xl mr-2">
-                Next
-              </Text>
+              <Text className="mr-2 text-xl font-bold text-white">Next</Text>
               <Ionicons name="arrow-forward" size={24} color="#fff" />
             </View>
           </TouchableOpacity>

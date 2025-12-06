@@ -10,25 +10,28 @@ export interface User {
 }
 
 export interface Occasion {
-  // was Group
+  // Renamed from Group
   id: string;
   name: string;
   budget?: number | null;
-  date?: string | null; // was exchangeDate
+  date?: string | null;
+  type: 'birthday' | 'valentine' | 'anniversary' | 'christmas' | 'wedding' | 'other';
   createdBy: string;
-  type: 'birthday' | 'valentine' | 'anniversary' | 'christmas' | 'other';
-  sharedWith: string[]; // was memberIds
-  members: OccasionMember[]; // people who can see this list
+  sharedWith: string[]; // renamed from memberIds
+  members: OccasionMember[];
   createdAt: Timestamp | Date;
   emoji: string;
   accent?: string;
+  creatorName: string;
+  isPrivate: boolean; // New: whether wishlist is private
 }
 
-export interface GroupInvite {
+export interface OccasionInvite {
+  // Renamed from GroupInvite
   id: string;
-  groupId: string;
-  groupName: string;
-  groupEmoji: string;
+  occasionId: string;
+  occasionName: string;
+  occasionEmoji: string;
   invitedByName: string;
   invitedByUserId: string;
   invitedUserEmail: string;
@@ -37,6 +40,7 @@ export interface GroupInvite {
 }
 
 export interface OccasionMember {
+  // Renamed from GroupMember
   userId: string;
   name: string;
   email?: string;
@@ -45,7 +49,7 @@ export interface OccasionMember {
 export interface WishlistItem {
   id: string;
   userId: string;
-  groupId: string;
+  occasionId: string; // renamed from groupId
   productName: string;
   productUrl: string;
   productImage?: string;
@@ -53,6 +57,7 @@ export interface WishlistItem {
   asin?: string;
   notes?: string;
   emoji?: string;
+  priority?: 1 | 2 | 3; // New: item priority
   createdAt: Timestamp | Date;
 }
 

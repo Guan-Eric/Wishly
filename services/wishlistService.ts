@@ -9,7 +9,7 @@ import {
   query,
   serverTimestamp,
   updateDoc,
-  where
+  where,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { WishlistItem } from '../types/index';
@@ -31,20 +31,26 @@ export const addWishlistItem = async (itemData: Partial<WishlistItem>) => {
 };
 
 /**
- * Get all wishlist items for a specific user and group (one-time fetch)
+ * Get all wishlist items for a specific user and occasion (one-time fetch)
  */
-export const getWishlistItems = async (userId: string, groupId: string): Promise<WishlistItem[]> => {
+export const getWishlistItems = async (
+  userId: string,
+  occasionId: string
+): Promise<WishlistItem[]> => {
   try {
     const q = query(
       collection(db, 'wishlistItems'),
       where('userId', '==', userId),
-      where('groupId', '==', groupId)
+      where('occasionId', '==', occasionId)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() 
-    } as WishlistItem));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WishlistItem
+    );
   } catch (error) {
     console.error('Error getting wishlist items:', error);
     throw error;
@@ -54,18 +60,24 @@ export const getWishlistItems = async (userId: string, groupId: string): Promise
 /**
  * Get wishlist items for another user (for viewing their wishlist)
  */
-export const getPersonWishlistItems = async (personId: string, groupId: string): Promise<WishlistItem[]> => {
+export const getPersonWishlistItems = async (
+  personId: string,
+  occasionId: string
+): Promise<WishlistItem[]> => {
   try {
     const q = query(
       collection(db, 'wishlistItems'),
       where('userId', '==', personId),
-      where('groupId', '==', groupId)
+      where('occasionId', '==', occasionId)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() 
-    } as WishlistItem));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WishlistItem
+    );
   } catch (error) {
     console.error('Error getting person wishlist items:', error);
     throw error;
@@ -76,25 +88,32 @@ export const getPersonWishlistItems = async (personId: string, groupId: string):
  * Subscribe to real-time updates for wishlist items
  */
 export const subscribeToWishlistItems = (
-  userId: string, 
-  groupId: string, 
+  userId: string,
+  occasionId: string,
   callback: (items: WishlistItem[]) => void
 ) => {
   const q = query(
     collection(db, 'wishlistItems'),
     where('userId', '==', userId),
-    where('groupId', '==', groupId)
+    where('occasionId', '==', occasionId)
   );
 
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WishlistItem));
-    callback(items);
-  }, (error) => {
-    console.error('Error in wishlist subscription:', error);
-  });
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const items = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as WishlistItem
+      );
+      callback(items);
+    },
+    (error) => {
+      console.error('Error in wishlist subscription:', error);
+    }
+  );
 
   return unsubscribe;
 };
@@ -104,24 +123,31 @@ export const subscribeToWishlistItems = (
  */
 export const subscribeToPersonWishlist = (
   personId: string,
-  groupId: string,
+  occasionId: string,
   callback: (items: WishlistItem[]) => void
 ) => {
   const q = query(
     collection(db, 'wishlistItems'),
     where('userId', '==', personId),
-    where('groupId', '==', groupId)
+    where('occasionId', '==', occasionId)
   );
 
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WishlistItem));
-    callback(items);
-  }, (error) => {
-    console.error('Error in person wishlist subscription:', error);
-  });
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const items = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as WishlistItem
+      );
+      callback(items);
+    },
+    (error) => {
+      console.error('Error in person wishlist subscription:', error);
+    }
+  );
 
   return unsubscribe;
 };
@@ -139,19 +165,19 @@ export const deleteWishlistItem = async (itemId: string): Promise<void> => {
 };
 
 /**
- * Get all wishlist items for a user across all groups
+ * Get all wishlist items for a user across all occasions
  */
 export const getAllUserWishlistItems = async (userId: string): Promise<WishlistItem[]> => {
   try {
-    const q = query(
-      collection(db, 'wishlistItems'),
-      where('userId', '==', userId)
-    );
+    const q = query(collection(db, 'wishlistItems'), where('userId', '==', userId));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() 
-    } as WishlistItem));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WishlistItem
+    );
   } catch (error) {
     console.error('Error getting all user wishlist items:', error);
     throw error;
@@ -161,7 +187,10 @@ export const getAllUserWishlistItems = async (userId: string): Promise<WishlistI
 /**
  * Update a wishlist item
  */
-export const updateWishlistItem = async (itemId: string, updates: Partial<WishlistItem>): Promise<void> => {
+export const updateWishlistItem = async (
+  itemId: string,
+  updates: Partial<WishlistItem>
+): Promise<void> => {
   try {
     const itemRef = doc(db, 'wishlistItems', itemId);
     await updateDoc(itemRef, updates);

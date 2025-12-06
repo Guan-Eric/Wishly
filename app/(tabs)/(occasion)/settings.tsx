@@ -2,7 +2,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { signOut, updateProfile } from 'firebase/auth';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Linking, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../../../firebase';
 import { updateUserProfile } from '../../../services/userService';
@@ -38,29 +47,25 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            setLoggingOut(true);
-            try {
-              await signOut(auth);
-              router.replace('/login');
-            } catch (error) {
-              console.error('Error logging out:', error);
-              Alert.alert('Error', 'Failed to logout');
-            } finally {
-              setLoggingOut(false);
-            }
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          setLoggingOut(true);
+          try {
+            await signOut(auth);
+            router.replace('/login');
+          } catch (error) {
+            console.error('Error logging out:', error);
+            Alert.alert('Error', 'Failed to logout');
+          } finally {
+            setLoggingOut(false);
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   const handleDeleteAccount = () => {
@@ -78,8 +83,8 @@ export default function SettingsScreen() {
               'Please contact support to delete your account. This ensures all your data is properly removed from our systems.',
               [{ text: 'OK' }]
             );
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -101,22 +106,17 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-stone-50">
-      <SafeAreaView edges={['top']} className="bg-emerald-600">
+      <SafeAreaView edges={['top']} className="bg-primary">
         <View className="px-4 pb-4">
           <View className="flex-row items-center">
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
-              className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4"
-            >
+              className="mr-4 h-12 w-12 items-center justify-center rounded-2xl bg-white/20">
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <View className="flex-1">
-              <Text className="text-3xl font-bold text-white">
-                Settings
-              </Text>
-              <Text className="text-white/80 text-sm">
-                Manage your account
-              </Text>
+              <Text className="text-3xl font-bold text-white">Settings</Text>
+              <Text className="text-sm text-white/80">Manage your account</Text>
             </View>
           </View>
         </View>
@@ -124,32 +124,28 @@ export default function SettingsScreen() {
 
       <ScrollView className="flex-1 px-4 pt-6">
         {/* Profile Section */}
-        <View className="bg-white rounded-2xl p-6 mb-4 border-2 border-stone-200">
-          <View className="flex-row items-center mb-5">
-            <View className="w-16 h-16 bg-emerald-100 rounded-full items-center justify-center mr-4">
+        <View className="mb-4 rounded-2xl border-2 border-stone-200 bg-white p-6">
+          <View className="mb-5 flex-row items-center">
+            <View className="mr-4 h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
               <Ionicons name="person" size={32} color="#059669" />
             </View>
             <View className="flex-1">
               <Text className="text-xl font-bold text-stone-900">
                 {user?.displayName || 'User'}
               </Text>
-              <Text className="text-stone-600 text-sm">
-                {user?.email}
-              </Text>
+              <Text className="text-sm text-stone-600">{user?.email}</Text>
             </View>
           </View>
 
           <View className="mb-4">
-            <Text className="text-stone-700 font-semibold mb-2">
-              Display Name
-            </Text>
-            <View className="bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3">
+            <Text className="mb-2 font-semibold text-stone-700">Display Name</Text>
+            <View className="rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3">
               <TextInput
                 placeholder="Your name"
                 placeholderTextColor="#A8A29E"
                 value={displayName}
                 onChangeText={setDisplayName}
-                className="text-stone-900 text-base"
+                className="text-base text-stone-900"
               />
             </View>
           </View>
@@ -157,35 +153,33 @@ export default function SettingsScreen() {
           <TouchableOpacity
             onPress={handleSaveProfile}
             disabled={saving}
-            className="bg-emerald-600 py-3 rounded-xl items-center active:scale-95"
-            activeOpacity={0.8}
-          >
+            className="bg-primary items-center rounded-xl py-3 active:scale-95"
+            activeOpacity={0.8}>
             {saving ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <View className="flex-row items-center">
                 <Ionicons name="checkmark-circle" size={20} color="#fff" />
-                <Text className="text-white font-bold ml-2">Save Changes</Text>
+                <Text className="ml-2 font-bold text-white">Save Changes</Text>
               </View>
             )}
           </TouchableOpacity>
         </View>
 
         {/* Account Actions */}
-        <View className="bg-white rounded-2xl mb-4 border-2 border-stone-200 overflow-hidden">
-          <Text className="text-sm text-stone-500 uppercase tracking-wider px-6 pt-5 pb-3">
+        <View className="mb-4 overflow-hidden rounded-2xl border-2 border-stone-200 bg-white">
+          <Text className="px-6 pb-3 pt-5 text-sm uppercase tracking-wider text-stone-500">
             Account
           </Text>
 
           <TouchableOpacity
             onPress={handleLogout}
             disabled={loggingOut}
-            className="px-6 py-4 flex-row items-center justify-between border-t-2 border-stone-100 active:bg-stone-50"
-            activeOpacity={0.7}
-          >
-            <View className="flex-row items-center flex-1">
+            className="flex-row items-center justify-between border-t-2 border-stone-100 px-6 py-4 active:bg-stone-50"
+            activeOpacity={0.7}>
+            <View className="flex-1 flex-row items-center">
               <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-              <Text className="text-stone-900 font-semibold ml-4">Logout</Text>
+              <Text className="ml-4 font-semibold text-stone-900">Logout</Text>
             </View>
             {loggingOut ? (
               <ActivityIndicator color="#EF4444" />
@@ -196,12 +190,11 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             onPress={handleDeleteAccount}
-            className="px-6 py-4 flex-row items-center justify-between border-t-2 border-stone-100 active:bg-stone-50"
-            activeOpacity={0.7}
-          >
-            <View className="flex-row items-center flex-1">
+            className="flex-row items-center justify-between border-t-2 border-stone-100 px-6 py-4 active:bg-stone-50"
+            activeOpacity={0.7}>
+            <View className="flex-1 flex-row items-center">
               <Ionicons name="trash-outline" size={24} color="#EF4444" />
-              <Text className="text-red-600 font-semibold ml-4">Delete Account</Text>
+              <Text className="ml-4 font-semibold text-red-600">Delete Account</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#A8A29E" />
           </TouchableOpacity>
@@ -251,26 +244,26 @@ export default function SettingsScreen() {
         </View> */}
 
         {/* App Info */}
-        <View className="bg-white rounded-2xl mb-4 border-2 border-stone-200 p-6">
-          <Text className="text-sm text-stone-500 uppercase tracking-wider mb-3">
-            About
-          </Text>
-          <View className="flex-row items-center justify-between mb-2">
+        <View className="mb-4 rounded-2xl border-2 border-stone-200 bg-white p-6">
+          <Text className="mb-3 text-sm uppercase tracking-wider text-stone-500">About</Text>
+          <View className="mb-2 flex-row items-center justify-between">
             <Text className="text-stone-700">App Version</Text>
-            <Text className="text-stone-900 font-semibold">{appVersion}</Text>
+            <Text className="font-semibold text-stone-900">{appVersion}</Text>
           </View>
           <View className="flex-row items-center justify-between">
             <Text className="text-stone-700">Made with</Text>
-            <Text className="text-stone-900 font-semibold">❤️ for the holidays</Text>
+            <Text className="font-semibold text-stone-900">❤️ for the holidays</Text>
           </View>
         </View>
 
         {/* Affiliate Disclosure */}
-        <View className="bg-emerald-50 rounded-2xl p-5 mb-6 border-2 border-emerald-200">
+        <View className="border-primary-200 bg-primary/10 mb-6 rounded-2xl border-2 p-5">
           <View className="flex-row items-start">
-            <Text className="text-2xl mr-3">🎅</Text>
-            <Text className="flex-1 text-emerald-800 text-xs">
-              This app uses Amazon affiliate links. When you purchase through our links, we earn a small commission at no extra cost to you. This helps keep the app free! Thank you for your support.
+            <Text className="mr-3 text-2xl">🎅</Text>
+            <Text className="text-primary-800 flex-1 text-xs">
+              This app uses Amazon affiliate links. When you purchase through our links, we earn a
+              small commission at no extra cost to you. This helps keep the app free! Thank you for
+              your support.
             </Text>
           </View>
         </View>

@@ -1,3 +1,4 @@
+// app/(tabs)/(occasion)/person-wishlist.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -5,20 +6,20 @@ import { ActivityIndicator, Linking, ScrollView, Text, TouchableOpacity, View } 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { subscribeToPersonWishlist } from '../../../services/wishlistService';
 import { WishlistItem } from '../../../types/index';
-import { normalizeAmazonLink } from 'services/amazonAPI';
+import { normalizeAmazonLink } from '../../../services/amazonAPI';
 
 export default function PersonWishlistScreen() {
-  const { groupId, personId, personName, accent } = useLocalSearchParams();
+  const { occasionId, personId, personName, accent } = useLocalSearchParams();
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    if (!personId || !groupId) return;
+    if (!personId || !occasionId) return;
 
     const unsubscribe = subscribeToPersonWishlist(
       personId as string,
-      groupId as string,
+      occasionId as string,
       (items) => {
         setWishlistItems(items);
         setLoading(false);
@@ -26,13 +27,14 @@ export default function PersonWishlistScreen() {
     );
 
     return unsubscribe;
-  }, [personId, groupId]);
+  }, [personId, occasionId]);
 
   const handleBuyOnAmazon = async (url: string) => {
     try {
-      const supported = await Linking.canOpenURL(await normalizeAmazonLink(url));
+      const normalizedUrl = await normalizeAmazonLink(url);
+      const supported = await Linking.canOpenURL(normalizedUrl);
       if (supported) {
-        await Linking.openURL(await normalizeAmazonLink(url));
+        await Linking.openURL(normalizedUrl);
       } else {
         alert('Cannot open Amazon link');
       }
@@ -44,29 +46,29 @@ export default function PersonWishlistScreen() {
 
   const getAccentColor = () => {
     const colors = {
-      emerald: '#059669',
-      red: '#EF4444',
-      amber: '#F59E0B',
+      primary: '#8B5CF6',
+      secondary: '#EC4899',
+      accent: '#F59E0B',
     };
-    return colors[accent as keyof typeof colors] || colors.emerald;
+    return colors[accent as keyof typeof colors] || colors.primary;
   };
 
   const getBgColor = () => {
     const colors = {
-      emerald: '#ECFDF5',
-      red: '#FEF2F2',
-      amber: '#FFFBEB',
+      primary: '#F5F3FF',
+      secondary: '#FCE7F3',
+      accent: '#FEF3C7',
     };
-    return colors[accent as keyof typeof colors] || colors.emerald;
+    return colors[accent as keyof typeof colors] || colors.primary;
   };
 
   const getBorderColor = () => {
     const colors = {
-      emerald: '#D1FAE5',
-      red: '#FECACA',
-      amber: '#FEF3C7',
+      primary: '#DDD6FE',
+      secondary: '#FBCFE8',
+      accent: '#FDE68A',
     };
-    return colors[accent as keyof typeof colors] || colors.emerald;
+    return colors[accent as keyof typeof colors] || colors.primary;
   };
 
   return (
@@ -152,19 +154,19 @@ export default function PersonWishlistScreen() {
                   </TouchableOpacity>
 
                   <Text className="mt-3 text-center text-xs text-stone-500">
-                    Opens Amazon • Supports our app 🎅
+                    Opens Amazon • Supports our app 🎁
                   </Text>
                 </View>
               ))}
             </>
           )}
 
-          <View className="mb-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+          <View className="mb-4 rounded-2xl border-2 border-primary/30 bg-primary/10 p-5">
             <View className="flex-row items-start">
               <Text className="mr-3 text-2xl">💡</Text>
-              <Text className="flex-1 text-sm text-emerald-900">
-                {personName} shared this wishlist with you! When you purchase through Amazon, you
-                support our app. 🎁
+              <Text className="flex-1 text-sm text-primary-dark">
+                {personName} has shared this wishlist with you! When you purchase through Amazon,
+                you support our app. 🎁
               </Text>
             </View>
           </View>

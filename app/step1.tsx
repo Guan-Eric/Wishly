@@ -1,4 +1,3 @@
-// app/onboarding/step1.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -8,67 +7,50 @@ export default function OnboardingStep1() {
   const router = useRouter();
 
   return (
-    <View className="flex-1" style={{ backgroundColor: '#ECFDF5' }}>
+    <View className="flex-1" style={{ backgroundColor: '#F5F3FF' }}>
       <SafeAreaView className="flex-1">
-        {/* Skip Button */}
-        <View className="absolute top-16 right-6 z-10">
-          <TouchableOpacity 
+        <View className="absolute right-6 top-16 z-10">
+          <TouchableOpacity
             onPress={() => router.replace('/login')}
-            className="bg-white/80 px-5 py-2 rounded-full"
-          >
-            <Text className="text-stone-600 font-semibold">Skip</Text>
+            className="rounded-full bg-white/80 px-5 py-2">
+            <Text className="font-semibold text-stone-600">Skip</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Content */}
-        <View className="flex-1 justify-center items-center px-8">
-                    {/* Icon Badge */}
-          <View 
-            className="rounded-2xl p-4 mb-8"
-            style={{ backgroundColor: '#059669' }}
-          >
+        <View className="flex-1 items-center justify-center px-8">
+          <View className="mb-8 rounded-2xl p-4" style={{ backgroundColor: '#8B5CF6' }}>
             <Ionicons name="gift" size={40} color="#fff" />
           </View>
 
-          {/* Text Content */}
           <View className="items-center">
-            <Text className="text-4xl font-bold text-stone-900 text-center mb-3">
-              Organize Secret Santa
+            <Text className="mb-3 text-center text-4xl font-bold text-stone-900">
+              Create Wishlists
             </Text>
-            
-            <Text 
-              className="text-xl font-semibold text-center mb-6"
-              style={{ color: '#059669' }}
-            >
-              Gift Exchanges Made Simple
+
+            <Text className="mb-6 text-center text-xl font-semibold" style={{ color: '#8B5CF6' }}>
+              For Every Occasion
             </Text>
-            
-            <Text className="text-lg text-stone-700 text-center leading-relaxed px-4">
-              Create groups and get matched anonymously with friends, family, or coworkers
+
+            <Text className="px-4 text-center text-lg leading-relaxed text-stone-700">
+              Birthdays, holidays, anniversaries — organize all your gift wishes in one place
             </Text>
           </View>
         </View>
 
-        {/* Bottom Controls */}
         <View className="px-6 pb-8">
-          {/* Dots Indicator */}
-          <View className="flex-row justify-center gap-2 mb-8">
-            <View className="h-2 w-8 rounded-full" style={{ backgroundColor: '#059669' }} />
+          <View className="mb-8 flex-row justify-center gap-2">
+            <View className="h-2 w-8 rounded-full" style={{ backgroundColor: '#8B5CF6' }} />
             <View className="h-2 w-2 rounded-full bg-stone-300" />
             <View className="h-2 w-2 rounded-full bg-stone-300" />
           </View>
 
-          {/* Next Button */}
           <TouchableOpacity
             onPress={() => router.push('/step2')}
-            className="py-5 rounded-xl items-center active:scale-95"
+            className="items-center rounded-xl py-5 active:scale-95"
             activeOpacity={0.8}
-            style={{ backgroundColor: '#059669' }}
-          >
+            style={{ backgroundColor: '#8B5CF6' }}>
             <View className="flex-row items-center">
-              <Text className="text-white font-bold text-xl mr-2">
-                Next
-              </Text>
+              <Text className="mr-2 text-xl font-bold text-white">Next</Text>
               <Ionicons name="arrow-forward" size={24} color="#fff" />
             </View>
           </TouchableOpacity>

@@ -2,7 +2,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebase';
 
@@ -21,7 +31,7 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.replace('/(tabs)/(group)/group');
+      router.replace('/(tabs)/(occasion)/occasion');
     } catch (error: any) {
       console.error('Login error:', error);
       Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
@@ -33,34 +43,28 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 bg-stone-50">
       <SafeAreaView edges={['top']} className="flex-1">
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          className="flex-1"
-        >
-          <ScrollView 
+          className="flex-1">
+          <ScrollView
             className="flex-1 px-6"
             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-            keyboardShouldPersistTaps="handled"
-          >
+            keyboardShouldPersistTaps="handled">
             {/* Header */}
-            <View className="items-center mb-12">
-              <View className="w-24 h-24 bg-emerald-100 rounded-full items-center justify-center mb-6">
+            <View className="mb-12 items-center">
+              <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-emerald-100">
                 <Text className="text-6xl">🎅</Text>
               </View>
-              <Text className="text-4xl font-bold text-stone-900 mb-2">
-                Welcome Back
-              </Text>
-              <Text className="text-base text-stone-600">
-                Sign in to continue your Secret Santa
-              </Text>
+              <Text className="mb-2 text-4xl font-bold text-stone-900">Welcome Back</Text>
+              <Text className="text-base text-stone-600">Continue your festive gift exchange</Text>
             </View>
 
             {/* Input Fields */}
             <View className="mb-6">
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Email
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-xl px-5 py-4 flex-row items-center mb-5">
+              <View className="mb-5 flex-row items-center rounded-xl border-2 border-stone-200 bg-white px-5 py-4">
                 <Ionicons name="mail-outline" size={22} color="#78716C" />
                 <TextInput
                   placeholder="email@example.com"
@@ -70,14 +74,14 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
-                  className="flex-1 text-stone-900 text-base ml-3"
+                  className="ml-3 flex-1 text-base text-stone-900"
                 />
               </View>
 
-              <Text className="text-stone-700 font-bold text-sm mb-3 ml-1 uppercase tracking-wider">
+              <Text className="mb-3 ml-1 text-sm font-bold uppercase tracking-wider text-stone-700">
                 Password
               </Text>
-              <View className="bg-white border-2 border-stone-200 rounded-xl px-5 py-4 flex-row items-center">
+              <View className="flex-row items-center rounded-xl border-2 border-stone-200 bg-white px-5 py-4">
                 <Ionicons name="lock-closed-outline" size={22} color="#78716C" />
                 <TextInput
                   placeholder="Enter your password"
@@ -85,7 +89,7 @@ export default function LoginScreen() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
-                  className="flex-1 text-stone-900 text-base ml-3"
+                  className="ml-3 flex-1 text-base text-stone-900"
                 />
               </View>
             </View>
@@ -94,43 +98,37 @@ export default function LoginScreen() {
             <TouchableOpacity
               onPress={handleLogin}
               disabled={loading}
-              className="py-5 rounded-xl items-center mb-4 active:scale-95"
+              className="mb-4 items-center rounded-xl py-5 active:scale-95"
               style={{ backgroundColor: '#059669' }}
-              activeOpacity={0.8}
-            >
+              activeOpacity={0.8}>
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
                 <View className="flex-row items-center">
                   <Ionicons name="log-in-outline" size={20} color="#fff" />
-                  <Text className="text-white font-bold text-lg ml-2">
-                    Sign In
-                  </Text>
+                  <Text className="ml-2 text-lg font-bold text-white">Sign In</Text>
                 </View>
               )}
             </TouchableOpacity>
 
-            {/* Divider */}
-            <View className="flex-row items-center my-6">
-              <View className="flex-1 h-px bg-stone-300" />
-              <Text className="text-stone-500 px-4 text-sm">or</Text>
-              <View className="flex-1 h-px bg-stone-300" />
+            {/* Terms Notice */}
+            <View className="mb-4 rounded-xl bg-stone-100 p-4">
+              <Text className="text-center text-xs text-stone-600">
+                By signing in, you agree to our Terms of Service and Privacy Policy
+              </Text>
             </View>
 
-            {/* Sign Up Link */}
-            <TouchableOpacity 
-              onPress={() => router.push('/signup')}
-              className="bg-stone-100 py-5 rounded-xl items-center active:scale-95"
-              activeOpacity={0.8}
-            >
-              <Text className="text-stone-900 font-bold text-lg">
-                Create New Account
+            {/* Signup Link */}
+            <TouchableOpacity onPress={() => router.push('/signup')} className="py-4">
+              <Text className="text-center text-base text-stone-700">
+                Don’t have an account?{' '}
+                <Text className="text-primary-700 font-bold">Create one</Text>
               </Text>
             </TouchableOpacity>
 
             {/* Festive Footer */}
-            <View className="items-center mt-8">
-              <Text className="text-stone-400 text-sm">🎄 ⛄ 🎁 ⭐ 🔔 🎄</Text>
+            <View className="mt-8 items-center">
+              <Text className="text-sm text-stone-400">🎁 ⭐ 🎅 ❄️ 🔔 🎁</Text>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

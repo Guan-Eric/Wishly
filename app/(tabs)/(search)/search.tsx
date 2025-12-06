@@ -16,16 +16,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../../../firebase';
-import { subscribeToUserGroups } from '../../../services/groupService';
+import { subscribeToUserOccasions } from '../../../services/occasionService';
 import { addWishlistItem } from '../../../services/wishlistService';
-import { Group } from '../../../types/index';
+import { Occasion } from '../../../types/index';
 
 const AMAZON_ASSOCIATE_TAG = Constants.expoConfig?.extra?.amazonAssociateTag;
 
 export default function SearchScreen() {
   const params = useLocalSearchParams();
-  const [selectedGroup, setSelectedGroup] = useState((params.groupId as string) || '');
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [selectedOccasion, setSelectedOccasion] = useState((params.occasionId as string) || '');
+  const [occasions, setOccasions] = useState<Occasion[]>([]);
   const [manualProductName, setManualProductName] = useState('');
   const [amazonUrl, setAmazonUrl] = useState('');
   const [manualPrice, setManualPrice] = useState('');
@@ -36,17 +36,17 @@ export default function SearchScreen() {
   const router = useRouter();
   const userId = auth.currentUser?.uid;
 
-  // Load user's groups
+  // Load user's occasions
   useEffect(() => {
     if (!userId) return;
 
-    const unsubscribe = subscribeToUserGroups(userId, (groupsData) => {
-      setGroups(groupsData);
+    const unsubscribe = subscribeToUserOccasions(userId, (occasionsData) => {
+      setOccasions(occasionsData);
       setLoading(false);
 
-      // If groupId was passed in params, use it
-      if (params.groupId) {
-        setSelectedGroup(params.groupId as string);
+      // If occasionId was passed in params, use it
+      if (params.occasionId) {
+        setSelectedOccasion(params.occasionId as string);
       }
     });
 
@@ -76,8 +76,8 @@ export default function SearchScreen() {
   };
 
   const handleAddManualItem = async () => {
-    if (!selectedGroup) {
-      Alert.alert('Select a Group', 'Please select a group first');
+    if (!selectedOccasion) {
+      Alert.alert('Select an Occasion', 'Please select an occasion first');
       return;
     }
 
@@ -102,7 +102,7 @@ export default function SearchScreen() {
 
       await addWishlistItem({
         userId,
-        groupId: selectedGroup,
+        occasionId: selectedOccasion,
         productName: manualProductName.trim(),
         productUrl: affiliateUrl,
         price: manualPrice.trim() || '',
@@ -115,7 +115,7 @@ export default function SearchScreen() {
           text: 'Add Another',
           style: 'cancel',
           onPress: () => {
-            // Clear form but keep group selected
+            // Clear form but keep occasion selected
             setManualProductName('');
             setAmazonUrl('');
             setManualPrice('');
@@ -149,17 +149,33 @@ export default function SearchScreen() {
     );
   };
 
+  const getOccasionColor = (type?: string) => {
+    const colors = {
+      birthday: '#EC4899',
+      valentine: '#EF4444',
+      anniversary: '#8B5CF6',
+      christmas: '#059669',
+      other: '#3B82F6',
+    };
+    return colors[type as keyof typeof colors] || colors.other;
+  };
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-stone-50">
-        <ActivityIndicator size="large" color="#059669" />
+        <ActivityIndicator size="large" color="#EC4899" />
       </View>
     );
   }
 
   return (
     <View className="flex-1 bg-stone-50">
-      <SafeAreaView edges={['top']} className="bg-emerald-600">
+      <SafeAreaView
+        edges={['top']}
+        style={{
+          backgroundColor:
+            getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type) || '#EC4899',
+        }}>
         <View className="px-4 pb-4">
           <View className="flex-row items-center">
             <TouchableOpacity
@@ -176,44 +192,70 @@ export default function SearchScreen() {
       </SafeAreaView>
 
       <ScrollView className="flex-1 px-4 pt-6">
-        {/* Group Selector */}
-        <View className="mb-6 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+        {/* Occasion Selector */}
+        <View
+          className="mb-6 rounded-2xl border-2 p-5"
+          style={{
+            borderColor: selectedOccasion
+              ? `${getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)}40`
+              : '#FED7AA',
+            backgroundColor: selectedOccasion
+              ? `${getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)}10`
+              : '#FFFBEB',
+          }}>
           <View className="mb-4 flex-row items-center">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-emerald-600">
-              <Ionicons name="list" size={20} color="#fff" />
+            <View
+              className="h-10 w-10 items-center justify-center rounded-xl"
+              style={{
+                backgroundColor: selectedOccasion
+                  ? getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)
+                  : '#F59E0B',
+              }}>
+              <Ionicons name="calendar" size={20} color="#fff" />
             </View>
-            <Text className="ml-3 text-sm font-bold uppercase tracking-wider text-emerald-900">
-              Select Group
+            <Text
+              className="ml-3 text-sm font-bold uppercase tracking-wider"
+              style={{
+                color: selectedOccasion
+                  ? getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)
+                  : '#92400E',
+              }}>
+              Select Occasion
             </Text>
           </View>
 
           <TouchableOpacity
             onPress={() => setDropdownVisible(true)}
-            className="flex-row items-center justify-between rounded-xl border-2 border-emerald-300 bg-white px-5 py-4 active:bg-stone-50"
+            className="flex-row items-center justify-between rounded-xl border-2 bg-white px-5 py-4 active:bg-stone-50"
+            style={{
+              borderColor: selectedOccasion
+                ? `${getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)}60`
+                : '#FED7AA',
+            }}
             activeOpacity={0.7}>
-            {selectedGroup ? (
+            {selectedOccasion ? (
               <View className="flex-1 flex-row items-center">
                 <Text className="mr-3 text-2xl">
-                  {groups.find((g) => g.id === selectedGroup)?.emoji}
+                  {occasions.find((o) => o.id === selectedOccasion)?.emoji}
                 </Text>
                 <Text className="flex-1 text-base font-semibold text-stone-900">
-                  {groups.find((g) => g.id === selectedGroup)?.name}
+                  {occasions.find((o) => o.id === selectedOccasion)?.name}
                 </Text>
               </View>
             ) : (
-              <Text className="text-base text-stone-500">Select a group...</Text>
+              <Text className="text-base text-stone-500">Select an occasion...</Text>
             )}
             <Ionicons name="chevron-down" size={20} color="#78716C" />
           </TouchableOpacity>
 
-          {!selectedGroup && (
-            <Text className="ml-1 mt-2 text-xs text-emerald-700">
-              Choose which group this item is for
+          {!selectedOccasion && (
+            <Text className="ml-1 mt-2 text-xs" style={{ color: '#92400E' }}>
+              Choose which occasion this item is for
             </Text>
           )}
         </View>
 
-        {/* Group Selection Modal */}
+        {/* Occasion Selection Modal */}
         <Modal
           visible={dropdownVisible}
           transparent
@@ -227,27 +269,36 @@ export default function SearchScreen() {
               <TouchableOpacity activeOpacity={1}>
                 <View className="rounded-t-3xl bg-white">
                   <View className="flex-row items-center justify-between border-b-2 border-stone-100 px-6 py-5">
-                    <Text className="text-xl font-bold text-stone-900">Select Group</Text>
+                    <Text className="text-xl font-bold text-stone-900">Select Occasion</Text>
                     <TouchableOpacity onPress={() => setDropdownVisible(false)}>
                       <Ionicons name="close" size={28} color="#57534E" />
                     </TouchableOpacity>
                   </View>
                   <ScrollView className="max-h-96">
-                    {groups.map((group) => (
+                    {occasions.map((occasion) => (
                       <TouchableOpacity
-                        key={group.id}
+                        key={occasion.id}
                         onPress={() => {
-                          setSelectedGroup(group.id);
+                          setSelectedOccasion(occasion.id);
                           setDropdownVisible(false);
                         }}
-                        className="flex-row items-center border-b border-stone-100 px-6 py-4 active:bg-emerald-50"
+                        className="flex-row items-center border-b border-stone-100 px-6 py-4 active:bg-stone-50"
                         activeOpacity={0.7}>
-                        <Text className="mr-4 text-3xl">{group.emoji}</Text>
-                        <Text className="flex-1 text-base font-semibold text-stone-900">
-                          {group.name}
-                        </Text>
-                        {selectedGroup === group.id && (
-                          <Ionicons name="checkmark-circle" size={24} color="#059669" />
+                        <Text className="mr-4 text-3xl">{occasion.emoji}</Text>
+                        <View className="flex-1">
+                          <Text className="text-base font-semibold text-stone-900">
+                            {occasion.name}
+                          </Text>
+                          <Text className="text-xs capitalize text-stone-500">
+                            {occasion.type} • {occasion.date || 'No date set'}
+                          </Text>
+                        </View>
+                        {selectedOccasion === occasion.id && (
+                          <Ionicons
+                            name="checkmark-circle"
+                            size={24}
+                            style={{ color: getOccasionColor(occasion.type) }}
+                          />
                         )}
                       </TouchableOpacity>
                     ))}
@@ -258,16 +309,19 @@ export default function SearchScreen() {
             </View>
           </TouchableOpacity>
         </Modal>
-        {!selectedGroup ? (
+
+        {!selectedOccasion ? (
           <View className="items-center py-20">
             <Image
               source={require('../../../assets/logo.png')}
               style={{ width: 100, height: 100, marginBottom: 24 }}
               resizeMode="contain"
             />
-            <Text className="mb-2 text-2xl font-semibold text-stone-900">Select a Group First</Text>
+            <Text className="mb-2 text-2xl font-semibold text-stone-900">
+              Select an Occasion First
+            </Text>
             <Text className="px-8 text-center text-stone-600">
-              Choose a group above to start adding items to your wishlist
+              Choose an occasion above to start adding items to your wishlist
             </Text>
           </View>
         ) : (
@@ -282,7 +336,7 @@ export default function SearchScreen() {
                     1. Browse Amazon and find a product{'\n'}
                     2. Copy the product URL{'\n'}
                     3. Paste it below with the product name{'\n'}
-                    4. Your Secret Santa will see it on your wishlist!
+                    4. Share your wishlist with loved ones!
                   </Text>
                 </View>
               </View>
@@ -367,7 +421,11 @@ export default function SearchScreen() {
                 onPress={handleAddManualItem}
                 disabled={adding}
                 className="items-center rounded-xl py-4 active:scale-95"
-                style={{ backgroundColor: '#059669' }}
+                style={{
+                  backgroundColor: getOccasionColor(
+                    occasions.find((o) => o.id === selectedOccasion)?.type
+                  ),
+                }}
                 activeOpacity={0.8}>
                 {adding ? (
                   <ActivityIndicator color="#fff" />
@@ -381,13 +439,21 @@ export default function SearchScreen() {
             </View>
 
             {/* Affiliate Disclosure */}
-            <View className="mb-6 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+            <View
+              className="mb-6 rounded-2xl border-2 p-5"
+              style={{
+                borderColor: `${getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)}40`,
+                backgroundColor: `${getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type)}10`,
+              }}>
               <View className="flex-row items-start">
-                <Text className="mr-3 text-2xl">🎅</Text>
-                <Text className="flex-1 text-sm text-emerald-800">
-                  When your Secret Santa buys through your Amazon links, we earn a small commission
-                  that helps keep the app free! Your affiliate tag is automatically added to all
-                  links.
+                <Text className="mr-3 text-2xl">💝</Text>
+                <Text
+                  className="flex-1 text-sm"
+                  style={{
+                    color: getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type),
+                  }}>
+                  When someone buys through your Amazon links, we earn a small commission that helps
+                  keep the app free! Your affiliate tag is automatically added to all links.
                 </Text>
               </View>
             </View>

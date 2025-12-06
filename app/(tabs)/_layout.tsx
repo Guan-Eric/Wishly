@@ -14,12 +14,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#065F46',
         tabBarInactiveTintColor: '#78716C',
         headerShown: false,
-      }}
-    >
+      }}>
       <Tabs.Screen
-        name="(group)"
+        name="(occasion)"
         options={{
-          title: 'My Groups',
+          title: 'Occasions',
           tabBarIcon: ({ color, size }) => (
             <View>
               <Ionicons name="people" size={size} color={color} />

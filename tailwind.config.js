@@ -4,10 +4,25 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        festive: {
-          red: '#991B1B',
-          green: '#065F46',
-          gold: '#F59E0B',
+        // New wishlist color palette
+        primary: {
+          DEFAULT: '#8B5CF6', // Purple
+          light: '#A78BFA',
+          dark: '#7C3AED',
+        },
+        secondary: {
+          DEFAULT: '#EC4899', // Pink
+          light: '#F472B6',
+          dark: '#DB2777',
+        },
+        accent: {
+          DEFAULT: '#F59E0B', // Amber
+          light: '#FCD34D',
+          dark: '#D97706',
+        },
+        background: {
+          DEFAULT: '#F9FAFB',
+          dark: '#F3F4F6',
         },
         stone: {
           50: '#FAFAF9',

@@ -44,7 +44,6 @@ export default function SearchScreen() {
       setOccasions(occasionsData);
       setLoading(false);
 
-      // If occasionId was passed in params, use it
       if (params.occasionId) {
         setSelectedOccasion(params.occasionId as string);
       }
@@ -57,10 +56,19 @@ export default function SearchScreen() {
     if (!url.trim()) return '';
 
     try {
+      // Handle amzn.to short links
+      if (url.includes('amzn.to/') || url.includes('a.co/')) {
+        // These short links will automatically redirect with our tag when opened
+        // But we should still try to add the tag
+        return url.includes('?')
+          ? `${url}&tag=${AMAZON_ASSOCIATE_TAG}`
+          : `${url}?tag=${AMAZON_ASSOCIATE_TAG}`;
+      }
+
       const urlObj = new URL(url);
 
       // Check if it's an Amazon URL
-      if (!urlObj.hostname.includes('amazon.com')) {
+      if (!urlObj.hostname.includes('amazon.com') && !urlObj.hostname.includes('amzn.')) {
         return url;
       }
 
@@ -72,6 +80,44 @@ export default function SearchScreen() {
       return url.includes('?')
         ? `${url}&tag=${AMAZON_ASSOCIATE_TAG}`
         : `${url}?tag=${AMAZON_ASSOCIATE_TAG}`;
+    }
+  };
+
+  const extractProductInfoFromUrl = (url: string): { name: string; asin: string | null } => {
+    try {
+      const urlObj = new URL(url);
+
+      // Extract ASIN from URL
+      const dpMatch = urlObj.pathname.match(/\/dp\/([A-Z0-9]{10})/i);
+      const gpMatch = urlObj.pathname.match(/\/gp\/product\/([A-Z0-9]{10})/i);
+      const asin = dpMatch?.[1] || gpMatch?.[1] || null;
+
+      // Try to extract product name from URL path
+      let productName = '';
+      const pathParts = urlObj.pathname.split('/');
+      const nameIndex = pathParts.findIndex((part) => part === 'dp' || part === 'product') - 1;
+      if (nameIndex >= 0 && pathParts[nameIndex]) {
+        productName = decodeURIComponent(pathParts[nameIndex])
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+      }
+
+      return { name: productName, asin };
+    } catch (error) {
+      return { name: '', asin: null };
+    }
+  };
+
+  const handlePasteFromClipboard = async () => {
+    try {
+      // Note: This is just a UX helper - the actual paste happens in the TextInput
+      Alert.alert(
+        'Paste Amazon Link',
+        'Copy any Amazon product link and paste it in the URL field below.',
+        [{ text: 'Got it!' }]
+      );
+    } catch (error) {
+      console.error('Error with clipboard:', error);
     }
   };
 
@@ -99,6 +145,7 @@ export default function SearchScreen() {
     setAdding(true);
     try {
       const affiliateUrl = addAffiliateTag(amazonUrl);
+      const { asin } = extractProductInfoFromUrl(amazonUrl);
 
       await addWishlistItem({
         userId,
@@ -108,6 +155,7 @@ export default function SearchScreen() {
         price: manualPrice.trim() || '',
         notes: manualNotes.trim() || '',
         emoji: '🎁',
+        asin: asin || undefined,
       });
 
       Alert.alert('Added! 🎁', `${manualProductName} has been added to your wishlist!`, [
@@ -115,7 +163,6 @@ export default function SearchScreen() {
           text: 'Add Another',
           style: 'cancel',
           onPress: () => {
-            // Clear form but keep occasion selected
             setManualProductName('');
             setAmazonUrl('');
             setManualPrice('');
@@ -128,7 +175,6 @@ export default function SearchScreen() {
         },
       ]);
 
-      // Clear form
       setManualProductName('');
       setAmazonUrl('');
       setManualPrice('');
@@ -141,22 +187,14 @@ export default function SearchScreen() {
     }
   };
 
-  const handleBrowseAmazon = () => {
-    Alert.alert(
-      '🎁 How to Add Items',
-      '1. Open Amazon in your browser\n2. Find a product you want\n3. Copy the product URL\n4. Paste it here along with the product name',
-      [{ text: 'Got it!' }]
-    );
-  };
-
   const getOccasionColor = (type?: string) => {
     const colors = {
-      birthday: '#EC4899', // Pink
-      valentine: '#EF4444', // Red
-      anniversary: '#8B5CF6', // Purple
-      wedding: '#F59E0B', // Amber
-      graduation: '#10B981', // Emerald/Green
-      other: '#3B82F6', // Blue
+      birthday: '#EC4899',
+      valentine: '#EF4444',
+      anniversary: '#8B5CF6',
+      wedding: '#F59E0B',
+      graduation: '#10B981',
+      other: '#3B82F6',
     };
     return colors[type as keyof typeof colors] || colors.other;
   };
@@ -327,6 +365,22 @@ export default function SearchScreen() {
           </View>
         ) : (
           <>
+            {/* Quick Add Instructions Card */}
+            <View className="mb-6 rounded-2xl border-2 border-blue-200 bg-blue-50 p-5">
+              <View className="mb-3 flex-row items-start">
+                <Text className="mr-3 text-3xl">🔗</Text>
+                <View className="flex-1">
+                  <Text className="mb-2 text-lg font-bold text-blue-900">
+                    Quick Add from Amazon
+                  </Text>
+                  <Text className="mb-3 text-sm leading-5 text-blue-800">
+                    Find a product on Amazon, copy the link (regular or short link works!), and
+                    paste it below. We'll automatically add our affiliate tag to support the app.
+                  </Text>
+                </View>
+              </View>
+            </View>
+
             {/* Instructions Card */}
             <View className="mb-6 rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
               <View className="mb-3 flex-row items-start">
@@ -341,12 +395,6 @@ export default function SearchScreen() {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity
-                onPress={handleBrowseAmazon}
-                className="mt-2 items-center rounded-xl bg-amber-600 py-3 active:scale-95"
-                activeOpacity={0.8}>
-                <Text className="font-bold text-white">View Instructions</Text>
-              </TouchableOpacity>
             </View>
 
             {/* Manual Entry Form */}
@@ -369,10 +417,17 @@ export default function SearchScreen() {
 
               {/* Amazon URL */}
               <View className="mb-4">
-                <Text className="mb-2 font-semibold text-stone-700">Amazon Product URL *</Text>
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="font-semibold text-stone-700">Amazon Product URL *</Text>
+                  <TouchableOpacity
+                    onPress={handlePasteFromClipboard}
+                    className="rounded-lg bg-blue-100 px-3 py-1">
+                    <Text className="text-xs font-semibold text-blue-900">📋 Paste</Text>
+                  </TouchableOpacity>
+                </View>
                 <View className="rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3">
                   <TextInput
-                    placeholder="https://www.amazon.com/..."
+                    placeholder="https://amazon.com/... or amzn.to/..."
                     placeholderTextColor="#A8A29E"
                     value={amazonUrl}
                     onChangeText={setAmazonUrl}
@@ -380,8 +435,12 @@ export default function SearchScreen() {
                     autoCorrect={false}
                     keyboardType="url"
                     className="text-base text-stone-900"
+                    multiline
                   />
                 </View>
+                <Text className="ml-1 mt-2 text-xs text-stone-500">
+                  Copy any Amazon product link - we'll add our affiliate tag automatically
+                </Text>
               </View>
 
               {/* Price (Optional) */}
@@ -454,7 +513,7 @@ export default function SearchScreen() {
                     color: getOccasionColor(occasions.find((o) => o.id === selectedOccasion)?.type),
                   }}>
                   When someone buys through your Amazon links, we earn a small commission that helps
-                  keep the app free! Your affiliate tag is automatically added to all links.
+                  keep the app free! Your affiliate tag is automatically added to all links. 🎁
                 </Text>
               </View>
             </View>

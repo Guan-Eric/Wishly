@@ -59,6 +59,10 @@ export interface WishlistItem {
   emoji?: string;
   priority?: 1 | 2 | 3; // New: item priority
   createdAt: Timestamp | Date;
+  isPurchased?: boolean;
+  purchasedBy?: string; // userId of who marked it as purchased
+  purchasedByName?: string; // Display name of purchaser
+  purchasedAt?: Timestamp | Date;
 }
 
 export interface AmazonProduct {

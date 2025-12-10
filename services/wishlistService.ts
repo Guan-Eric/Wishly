@@ -21,6 +21,10 @@ export const addWishlistItem = async (itemData: Partial<WishlistItem>) => {
   try {
     const docRef = await addDoc(collection(db, 'wishlistItems'), {
       ...itemData,
+      isPurchased: false,
+      purchasedBy: null,
+      purchasedByName: null,
+      purchasedAt: null,
       createdAt: serverTimestamp(),
     });
     return docRef.id;
@@ -196,6 +200,46 @@ export const updateWishlistItem = async (
     await updateDoc(itemRef, updates);
   } catch (error) {
     console.error('Error updating wishlist item:', error);
+    throw error;
+  }
+};
+
+/**
+ * Mark an item as purchased
+ */
+export const markItemAsPurchased = async (
+  itemId: string,
+  purchasedBy: string,
+  purchasedByName: string
+): Promise<void> => {
+  try {
+    const itemRef = doc(db, 'wishlistItems', itemId);
+    await updateDoc(itemRef, {
+      isPurchased: true,
+      purchasedBy,
+      purchasedByName,
+      purchasedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Error marking item as purchased:', error);
+    throw error;
+  }
+};
+
+/**
+ * Unmark an item as purchased
+ */
+export const unmarkItemAsPurchased = async (itemId: string): Promise<void> => {
+  try {
+    const itemRef = doc(db, 'wishlistItems', itemId);
+    await updateDoc(itemRef, {
+      isPurchased: false,
+      purchasedBy: null,
+      purchasedByName: null,
+      purchasedAt: null,
+    });
+  } catch (error) {
+    console.error('Error unmarking item as purchased:', error);
     throw error;
   }
 };

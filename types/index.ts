@@ -15,7 +15,7 @@ export interface Occasion {
   name: string;
   budget?: number | null;
   date?: string | null;
-  type: 'birthday' | 'valentine' | 'anniversary' | 'christmas' | 'wedding' | 'other';
+  type: 'birthday' | 'valentine' | 'anniversary' | 'wedding' | 'graduation' | 'other';
   createdBy: string;
   sharedWith: string[]; // renamed from memberIds
   members: OccasionMember[];

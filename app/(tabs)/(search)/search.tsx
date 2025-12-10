@@ -151,11 +151,12 @@ export default function SearchScreen() {
 
   const getOccasionColor = (type?: string) => {
     const colors = {
-      birthday: '#EC4899',
-      valentine: '#EF4444',
-      anniversary: '#8B5CF6',
-      christmas: '#059669',
-      other: '#3B82F6',
+      birthday: '#EC4899', // Pink
+      valentine: '#EF4444', // Red
+      anniversary: '#8B5CF6', // Purple
+      wedding: '#F59E0B', // Amber
+      graduation: '#10B981', // Emerald/Green
+      other: '#3B82F6', // Blue
     };
     return colors[type as keyof typeof colors] || colors.other;
   };

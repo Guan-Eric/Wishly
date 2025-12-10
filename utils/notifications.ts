@@ -43,7 +43,7 @@ export const registerForPushNotifications = async () => {
 export const sendLocalNotification = async (title: string, body: string) => {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: `🎅 ${title}`,
+      title: `💝 ${title}`,
       body: `${body} 🎄`,
       sound: true,
     },

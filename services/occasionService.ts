@@ -29,7 +29,7 @@ export const createOccasion = async (occasionData: Partial<Occasion>) => {
       birthday: '🎂',
       valentine: '💝',
       anniversary: '💐',
-      christmas: '🎄',
+      graduation: '🎓',
       wedding: '💍',
       other: '🎁',
     };

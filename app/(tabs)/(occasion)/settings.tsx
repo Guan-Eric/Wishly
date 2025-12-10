@@ -153,7 +153,7 @@ export default function SettingsScreen() {
           <TouchableOpacity
             onPress={handleSaveProfile}
             disabled={saving}
-            className="bg-primary items-center rounded-xl py-3 active:scale-95"
+            className="items-center rounded-xl bg-primary py-3 active:scale-95"
             activeOpacity={0.8}>
             {saving ? (
               <ActivityIndicator color="#fff" />
@@ -252,14 +252,14 @@ export default function SettingsScreen() {
           </View>
           <View className="flex-row items-center justify-between">
             <Text className="text-stone-700">Made with</Text>
-            <Text className="font-semibold text-stone-900">❤️ for the holidays</Text>
+            <Text className="font-semibold text-stone-900">❤️ for special moments</Text>
           </View>
         </View>
 
         {/* Affiliate Disclosure */}
-        <View className="border-primary-200 bg-primary/10 mb-6 rounded-2xl border-2 p-5">
+        <View className="border-primary-200 mb-6 rounded-2xl border-2 bg-primary/10 p-5">
           <View className="flex-row items-start">
-            <Text className="mr-3 text-2xl">🎅</Text>
+            <Text className="mr-3 text-2xl">💝</Text>
             <Text className="text-primary-800 flex-1 text-xs">
               This app uses Amazon affiliate links. When you purchase through our links, we earn a
               small commission at no extra cost to you. This helps keep the app free! Thank you for

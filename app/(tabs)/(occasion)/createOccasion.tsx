@@ -19,8 +19,8 @@ const OCCASION_TYPES = [
   { value: 'birthday', label: 'Birthday', emoji: '🎂', color: '#EC4899' },
   { value: 'valentine', label: "Valentine's", emoji: '💝', color: '#EF4444' },
   { value: 'anniversary', label: 'Anniversary', emoji: '💐', color: '#8B5CF6' },
-  { value: 'christmas', label: 'Christmas', emoji: '🎄', color: '#10B981' },
   { value: 'wedding', label: 'Wedding', emoji: '💍', color: '#F59E0B' },
+  { value: 'graduation', label: 'Graduation', emoji: '🎓', color: '#10B981' },
   { value: 'other', label: 'Other', emoji: '🎁', color: '#6366F1' },
 ];
 
@@ -29,7 +29,7 @@ export default function CreateOccasionScreen() {
   const [budget, setBudget] = useState('');
   const [date, setDate] = useState('');
   const [occasionType, setOccasionType] = useState<
-    'birthday' | 'valentine' | 'anniversary' | 'christmas' | 'wedding' | 'other'
+    'birthday' | 'valentine' | 'anniversary' | 'wedding' | 'graduation' | 'other'
   >('birthday');
   const [emails, setEmails] = useState(['']);
   const [loading, setLoading] = useState(false);
@@ -139,8 +139,8 @@ export default function CreateOccasionScreen() {
                       | 'birthday'
                       | 'valentine'
                       | 'anniversary'
-                      | 'christmas'
                       | 'wedding'
+                      | 'graduation'
                       | 'other'
                   )
                 }

@@ -53,7 +53,7 @@ export default function LoginScreen() {
             {/* Header */}
             <View className="mb-12 items-center">
               <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-emerald-100">
-                <Text className="text-6xl">🎅</Text>
+                <Text className="text-6xl">💝</Text>
               </View>
               <Text className="mb-2 text-4xl font-bold text-stone-900">Welcome Back</Text>
               <Text className="text-base text-stone-600">Continue your festive gift exchange</Text>
@@ -128,7 +128,7 @@ export default function LoginScreen() {
 
             {/* Festive Footer */}
             <View className="mt-8 items-center">
-              <Text className="text-sm text-stone-400">🎁 ⭐ 🎅 ❄️ 🔔 🎁</Text>
+              <Text className="text-sm text-stone-400">💝 ✨ 🎁 💐 🎂 💍</Text>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

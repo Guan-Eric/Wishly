@@ -165,7 +165,7 @@ export default function SignupScreen() {
 
             {/* Festive Footer */}
             <View className="mt-8 items-center">
-              <Text className="text-sm text-stone-400">🎁 ⭐ 🎅 ❄️ 🔔 🎁</Text>
+              <Text className="text-sm text-stone-400">💝 ✨ 🎁 💐 🎂 💍</Text>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

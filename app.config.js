@@ -38,6 +38,9 @@ export default {
       appId: process.env.FIREBASE_APP_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       amazonAssociateTag: process.env.AMAZON_ASSOCIATE_TAG,
+      eas: {
+        projectId: '6dfcaa99-1054-4ead-b7ec-fa9e5e02f042',
+      },
     },
     orientation: 'portrait',
     icon: './assets/icon.png',
@@ -52,6 +55,10 @@ export default {
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
+      bundleIdentifier: 'com.wishlyguan.app',
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false,
+      },
     },
     android: {
       adaptiveIcon: {

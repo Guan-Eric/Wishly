@@ -1,12 +1,10 @@
-// services/occasionService.ts (renamed from groupService.ts)
+// services/occasionService.ts - Fixed version with better error handling
 import {
   addDoc,
-  arrayRemove,
   arrayUnion,
   collection,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   query,
   serverTimestamp,
@@ -55,9 +53,10 @@ export const createOccasion = async (occasionData: Partial<Occasion>) => {
     };
 
     const docRef = await addDoc(collection(db, 'occasions'), newOccasion);
+    console.log('✅ Created occasion:', docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error('Error creating occasion:', error);
+    console.error('❌ Error creating occasion:', error);
     throw error;
   }
 };
@@ -69,26 +68,46 @@ export const subscribeToUserOccasions = (
   userId: string,
   callback: (occasions: Occasion[]) => void
 ) => {
-  const q = query(collection(db, 'occasions'), where('sharedWith', 'array-contains', userId));
+  console.log('🔔 Setting up occasions subscription for user:', userId);
 
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      const occasions = snapshot.docs.map(
-        (doc) =>
-          ({
+  if (!userId) {
+    console.error('❌ Cannot subscribe: userId is null or undefined');
+    return () => {};
+  }
+
+  try {
+    const q = query(collection(db, 'occasions'), where('sharedWith', 'array-contains', userId));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        console.log('📦 Received occasions update:', snapshot.size, 'documents');
+        const occasions = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          console.log('  - Occasion:', doc.id, data.name);
+          return {
             id: doc.id,
-            ...doc.data(),
-          }) as Occasion
-      );
-      callback(occasions);
-    },
-    (error) => {
-      console.error('Error in occasions subscription:', error);
-    }
-  );
+            ...data,
+          } as Occasion;
+        });
+        callback(occasions);
+      },
+      (error) => {
+        console.error('❌ Error in occasions subscription:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
 
-  return unsubscribe;
+        // Call callback with empty array to prevent app from hanging
+        callback([]);
+      }
+    );
+
+    console.log('✅ Occasions subscription created');
+    return unsubscribe;
+  } catch (error) {
+    console.error('❌ Failed to create occasions subscription:', error);
+    return () => {};
+  }
 };
 
 /**
@@ -96,13 +115,18 @@ export const subscribeToUserOccasions = (
  */
 export const getOccasionById = async (occasionId: string): Promise<Occasion | null> => {
   try {
+    console.log('🔍 Fetching occasion:', occasionId);
     const occasionDoc = await getDoc(doc(db, 'occasions', occasionId));
+
     if (occasionDoc.exists()) {
+      console.log('✅ Found occasion:', occasionDoc.id);
       return { id: occasionDoc.id, ...occasionDoc.data() } as Occasion;
     }
+
+    console.log('⚠️ Occasion not found:', occasionId);
     return null;
   } catch (error) {
-    console.error('Error getting occasion by ID:', error);
+    console.error('❌ Error getting occasion by ID:', error);
     throw error;
   }
 };
@@ -115,9 +139,11 @@ export const updateOccasion = async (
   updates: Partial<Occasion>
 ): Promise<void> => {
   try {
+    console.log('📝 Updating occasion:', occasionId);
     await updateDoc(doc(db, 'occasions', occasionId), updates);
+    console.log('✅ Occasion updated');
   } catch (error) {
-    console.error('Error updating occasion:', error);
+    console.error('❌ Error updating occasion:', error);
     throw error;
   }
 };
@@ -135,6 +161,8 @@ export const sendOccasionInvite = async (
   invitedByUserId: string
 ) => {
   try {
+    console.log('📧 Sending invite to:', invitedUserEmail);
+
     const inviteData = {
       occasionId,
       occasionName,
@@ -148,8 +176,9 @@ export const sendOccasionInvite = async (
     };
 
     await addDoc(collection(db, 'occasionInvites'), inviteData);
+    console.log('✅ Invite sent');
   } catch (error) {
-    console.error('Error sending invite:', error);
+    console.error('❌ Error sending invite:', error);
     throw error;
   }
 };
@@ -161,30 +190,50 @@ export const subscribeToUserInvites = (
   userEmail: string,
   callback: (invites: OccasionInvite[]) => void
 ) => {
-  const q = query(
-    collection(db, 'occasionInvites'),
-    where('invitedUserEmail', '==', userEmail.toLowerCase()),
-    where('status', '==', 'pending')
-  );
+  console.log('🔔 Setting up invites subscription for email:', userEmail);
 
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      const invites = snapshot.docs.map(
-        (doc) =>
-          ({
+  if (!userEmail) {
+    console.error('❌ Cannot subscribe: userEmail is null or undefined');
+    return () => {};
+  }
+
+  try {
+    const q = query(
+      collection(db, 'occasionInvites'),
+      where('invitedUserEmail', '==', userEmail.toLowerCase()),
+      where('status', '==', 'pending')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        console.log('📨 Received invites update:', snapshot.size, 'documents');
+        const invites = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          console.log('  - Invite:', doc.id, data.occasionName);
+          return {
             id: doc.id,
-            ...doc.data(),
-          }) as OccasionInvite
-      );
-      callback(invites);
-    },
-    (error) => {
-      console.error('Error in invites subscription:', error);
-    }
-  );
+            ...data,
+          } as OccasionInvite;
+        });
+        callback(invites);
+      },
+      (error) => {
+        console.error('❌ Error in invites subscription:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
 
-  return unsubscribe;
+        // Call callback with empty array to prevent app from hanging
+        callback([]);
+      }
+    );
+
+    console.log('✅ Invites subscription created');
+    return unsubscribe;
+  } catch (error) {
+    console.error('❌ Failed to create invites subscription:', error);
+    return () => {};
+  }
 };
 
 /**
@@ -198,6 +247,8 @@ export const acceptOccasionInvite = async (
   userEmail: string
 ) => {
   try {
+    console.log('✅ Accepting invite:', inviteId);
+
     await updateDoc(doc(db, 'occasionInvites', inviteId), {
       status: 'accepted',
     });
@@ -211,8 +262,10 @@ export const acceptOccasionInvite = async (
         email: userEmail,
       }),
     });
+
+    console.log('✅ Invite accepted');
   } catch (error) {
-    console.error('Error accepting invite:', error);
+    console.error('❌ Error accepting invite:', error);
     throw error;
   }
 };
@@ -222,11 +275,15 @@ export const acceptOccasionInvite = async (
  */
 export const declineOccasionInvite = async (inviteId: string) => {
   try {
+    console.log('❌ Declining invite:', inviteId);
+
     await updateDoc(doc(db, 'occasionInvites', inviteId), {
       status: 'declined',
     });
+
+    console.log('✅ Invite declined');
   } catch (error) {
-    console.error('Error declining invite:', error);
+    console.error('❌ Error declining invite:', error);
     throw error;
   }
 };

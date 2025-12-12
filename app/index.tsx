@@ -13,20 +13,15 @@ function Index() {
       try {
         if (!user) {
           // No user - navigate after interactions complete
-        
-            router.replace('/step1');
-            setLoading(false);
- 
-          return;
-        }
-        router.replace("/(tabs)/(group)/group")
-        
-      } catch (error) {
-        console.error('Error in auth check:', error);
-       
           router.replace('/step1');
           setLoading(false);
-  
+          return;
+        }
+        router.replace('/(tabs)/(occasion)/occasion');
+      } catch (error) {
+        console.error('Error in auth check:', error);
+        router.replace('/step1');
+        setLoading(false);
       }
     });
 

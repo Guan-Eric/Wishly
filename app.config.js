@@ -9,7 +9,6 @@ export default {
     },
 
     experiments: {
-      tsconfigPaths: true,
       typedRoutes: true,
       reactCompiler: true,
     },
@@ -23,11 +22,9 @@ export default {
           imageWidth: 200,
           resizeMode: 'contain',
           backgroundColor: '#ffffff',
-          dark: {
-            backgroundColor: '#000000',
-          },
         },
       ],
+      'expo-web-browser',
     ],
     extra: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
@@ -44,8 +41,8 @@ export default {
     },
     orientation: 'portrait',
     icon: './assets/icon.png',
-
-    userInterfaceStyle: 'light',
+    scheme: "wishly",
+    userInterfaceStyle: "automatic",
 
     splash: {
       image: './assets/logo.png',
